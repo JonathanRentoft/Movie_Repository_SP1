@@ -1,4 +1,4 @@
-Det her er mit projekt til SP1, hvor vi bygger en backend til at holde styr på en masse film.
+Det her er mit projekt til SP1, hvor jeg har bygget en backend til at holde styr på en masse film.
 
 Hvad kan den? 
 Systemet henter en masse data om danske film (og co-produktioner) fra de sidste 5 år fra The Movie Database (TMDb) API og gemmer dem i vores egen PostgreSQL-database.
