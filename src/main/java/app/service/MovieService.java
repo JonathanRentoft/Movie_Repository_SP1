@@ -12,6 +12,7 @@ import app.entities.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
+import java.util.List;
 
 public class MovieService {
     private EntityManagerFactory emf;
@@ -26,6 +27,69 @@ public class MovieService {
         this.emf = emf;
     }
 
+    public List<Movie> getTopRatedMovies(int count) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getTopRated(count, em);
+        }
+    }
+
+    public List<Movie> searchMovieByTitle(String title) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.searchByTitle(title, em);
+        }
+    }
+
+    public double getAverageMovieRating() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getAverageRating(em);
+        }
+    }
+    // Henter alle film
+    public List<Movie> getAllMovies() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getAll(em);
+        }
+    }
+
+    // Henter de X mest populære film
+    public List<Movie> getMostPopularMovies(int count) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getMostPopular(count, em);
+        }
+    }
+
+    // Henter de X lavest ratede film
+    public List<Movie> getLowestRatedMovies(int count) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getLowestRated(count, em);
+        }
+    }
+
+    // Henter alle film for en specifik genre
+    public List<Movie> getMoviesByGenre(String genreName) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return movieDAO.getMoviesByGenre(genreName, em);
+        }
+    }
+
+    // Opdaterer en film
+    public Movie updateMovie(Movie movie) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            Movie updatedMovie = movieDAO.update(movie, em);
+            em.getTransaction().commit();
+            return updatedMovie;
+        }
+    }
+
+    // Sletter en film
+    public void deleteMovie(long id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            movieDAO.delete(id, em);
+            em.getTransaction().commit();
+        }
+    }
     public void populateGenres() {
         System.out.println("Populating genres table...");
         try {

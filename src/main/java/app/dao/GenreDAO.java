@@ -2,6 +2,9 @@ package app.dao;
 
 import app.entities.Genre;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
+import java.util.List;
 
 public class GenreDAO {
 
@@ -11,5 +14,9 @@ public class GenreDAO {
 
     public void save(Genre genre, EntityManager em) {
         em.merge(genre);
+    }
+    public List<Genre> getAll(EntityManager em) {
+        TypedQuery<Genre> query = em.createQuery("SELECT a FROM Actor a", Genre.class);
+        return query.getResultList();
     }
 }

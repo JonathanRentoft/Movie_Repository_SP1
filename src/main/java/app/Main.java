@@ -7,7 +7,6 @@ import app.dto.MovieDTO;
 import app.service.MovieFetcher;
 import app.service.MovieService;
 import jakarta.persistence.EntityManagerFactory;
-
 import java.io.IOException;
 
 public class Main {
@@ -17,28 +16,53 @@ public class Main {
         MovieFetcher fetcher = new MovieFetcher();
         MovieService movieService = new MovieService(emf);
 
-        System.out.println("Fetching and saving data from TMDb...");
+        // --- PRE-POPULATE (Once-only operation) ---
+        // Sørger for at vores 'genres' tabel er fyldt, før vi gemmer film.
+        movieService.populateGenres();
 
         // --- FETCH & SAVE LOOP ---
+        System.out.println("\nFetching and saving ALL movies from the last 5 years...");
+
         // Hent første side for at vide, hvor mange sider der er i alt
         MovieApiResultDTO firstPage = fetcher.fetchMovies(1);
         int totalPages = firstPage.getTotalPages();
-        System.out.println("Total pages of movies: " + totalPages);
+        System.out.println("Total pages to process: " + totalPages);
 
-        // Loop gennem alle sider (eller færre for test)
-        for (int i = 1; i <= 5; i++) { // Begræns stadig for test
-            System.out.println("Processing page " + i);
-            MovieApiResultDTO resultPage = fetcher.fetchMovies(i);
+        // Først, behandl filmene fra den side, vi allerede har hentet
+        System.out.println("Processing page 1 of " + totalPages);
+        for (MovieDTO movieDTO : firstPage.getResults()) {
+            processAndSaveMovie(movieDTO, fetcher, movieService);
+        }
 
-            for (MovieDTO movieDTO : resultPage.getResults()) {
-                // For hver film, hent dens credits (skuespillere/instruktør)
-                CreditsDTO creditsDTO = fetcher.fetchCredits(movieDTO.getId());
-
-                // Brug MovieService til at konvertere og gemme
-                movieService.saveMovieFromDTOs(movieDTO, creditsDTO);
+        // husk at ændre 5 til totalPages inden aflevering ;)
+        for (int i = 2; i <= totalPages; i++) {
+            System.out.println("Processing page " + i + " of " + totalPages);
+            try {
+                MovieApiResultDTO resultPage = fetcher.fetchMovies(i);
+                for (MovieDTO movieDTO : resultPage.getResults()) {
+                    processAndSaveMovie(movieDTO, fetcher, movieService);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to process page " + i + ". Continuing to next page.");
+                e.printStackTrace();
             }
         }
 
-        System.out.println("\n--- Data processing complete. ---");
+        System.out.println("\n--- Full data import complete. ---");
+        emf.close(); // Luk forbindelsen når programmet er færdigt
+    }
+
+    /**
+     * Helper-metode til at hente credits og gemme en enkelt film.
+     * Dette undgår kode-gentagelse.
+     */
+    private static void processAndSaveMovie(MovieDTO movieDTO, MovieFetcher fetcher, MovieService movieService) {
+        try {
+            CreditsDTO creditsDTO = fetcher.fetchCredits(movieDTO.getId());
+            movieService.saveMovieFromDTOs(movieDTO, creditsDTO);
+        } catch (Exception e) {
+            System.err.println("Failed to process movie: " + movieDTO.getTitle());
+            e.printStackTrace();
+        }
     }
 }
