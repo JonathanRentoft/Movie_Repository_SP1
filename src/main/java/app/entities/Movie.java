@@ -1,6 +1,7 @@
 package app.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Movie {
 
     @Id
@@ -29,8 +31,15 @@ public class Movie {
     private double popularity;
     private String posterPath;
 
-    // DET ER DISSE 3 BLOKKE, DU SKAL SIKRE DIG, AT DU HAR:
-
+    public Movie(Long id, String title, String overview, LocalDate releaseDate, double rating, double popularity, String posterPath) {
+        this.id = id;
+        this.title = title;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.rating = rating;
+        this.popularity = popularity;
+        this.posterPath = posterPath;
+    }
     // --- Relation til Genre ---
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
