@@ -26,7 +26,7 @@ public class MovieFetcher {
         Properties properties = new Properties();
         try (InputStream input = MovieFetcher.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
-                System.out.println("Sorry, unable to find config.properties");
+                System.out.println("fejl ved loading af api key");
                 return null;
             }
             properties.load(input);
@@ -39,7 +39,7 @@ public class MovieFetcher {
 
     public MovieApiResultDTO fetchMovies(int page) throws IOException, InterruptedException {
         String url = String.format("%s/discover/movie?api_key=%s&with_origin_country=DK&language=da-DK&release_date.gte=%s&release_date.lte=%s&page=%d",
-                BASE_URL, API_KEY, LocalDate.now().minusYears(5).toString(), LocalDate.now().toString(), page);
+                BASE_URL, API_KEY, LocalDate.now().minusYears(5), LocalDate.now(), page);
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
@@ -58,11 +58,8 @@ public class MovieFetcher {
         return objectMapper.readValue(response.body(), CreditsDTO.class);
     }
 
-    // --- DENNE METODE MANGLER DU ---
-    /**
-     * Henter den komplette liste af filmgenrer fra TMDb.
-     * @return Et DTO-objekt, der indeholder en liste af alle genrer.
-     */
+     //Henter den komplette liste af filmgenrer fra TMDb.
+
     public GenreApiResultDTO fetchGenres() throws IOException, InterruptedException {
         String url = String.format("%s/genre/movie/list?api_key=%s&language=da-DK", BASE_URL, API_KEY);
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
