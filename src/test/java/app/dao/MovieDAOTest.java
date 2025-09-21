@@ -47,7 +47,7 @@ class MovieDAOTest {
 
     @BeforeEach
     void setUp() {
-        // Sletter og genskaber databasen før HVER test for at sikre uafhængighed
+        // Sletter og genskaber databasen før HVER test
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
             // Slet data i den rigtige rækkefølge pga. foreign key constraints

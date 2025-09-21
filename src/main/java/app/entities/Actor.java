@@ -16,19 +16,16 @@ import java.util.Set;
 public class Actor {
 
     @Id
-    private Long id; // Brug TMDb's ID for at undgå dubletter
+    private Long id;
 
     @Column(nullable = false)
     private String name;
 
     // Vi definerer den anden side af Many-to-Many relationen
-    // 'mappedBy = "actors"' refererer til 'actors' feltet i Movie-klassen.
-    // Det fortæller Hibernate, at Movie-klassen "ejer" relationen,
-    // og at join-tabellen allerede er defineret der.
+    // 'mappedBy = "actors"' refererer til vores 'actors' feltet i Movie-klassen.
     @ManyToMany(mappedBy = "actors")
     private Set<Movie> movies = new HashSet<>();
 
-    // En god idé at have en constructor, der tager de vigtigste felter
     public Actor(Long id, String name) {
         this.id = id;
         this.name = name;
